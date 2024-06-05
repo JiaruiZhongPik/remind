@@ -13,6 +13,9 @@ parameters
 pm_welf(tall)                                     "Weight parameter in the welfare function to avoid jumps for years between differnet time step lengths"
 pm_w(all_regi)                                    "Negishi weights"
 pm_prtp(all_regi)                                 "Pure rate of time preference"
+p02_cons_ref(ttot,all_regi)			  "Consumption in the reference run"
+p02_consShare_seg_pre(ttot,all_regi,seg)	  "Baseline consumption share of the subnational household segment"
+p02_ineqa					  "Within-countyr inequality aversion parameter"
 
 pm_sccIneq(tall,all_regi)			  "inequality term in the SCC calculation"
 
@@ -46,6 +49,13 @@ v02_PosInconvPenFeBioSwitch(ttot,all_regi,all_enty,all_enty,emi_sectors,all_emiM
 ;
 $ENDIF.INCONV_bioSwitch
 
+positive variables
+v02_cons_eq(ttot,all_regi)			  "Regional equivalent consumption"
+v02_cons_seg(ttot,all_regi,seg)		    "Consumption of a subnational household segment"
+v02_cons_seg_pre(ttot,all_regi,seg)		  "Baseline consumption of subnational household segments"
+;
+
+
 
 ***-------------------------------------------------------------------------------
 ***                                   EQUATIONS
@@ -53,6 +63,10 @@ $ENDIF.INCONV_bioSwitch
 equations
 q02_welfareGlob                                   "Global welfare"
 q02_welfare                                       "Regional welfare"
+q02_cons_eq(ttot,all_regi)			  "Regional equivalent consumption"		
+q02_cons_seg(ttot,all_regi,seg)	                    "Consumption of a subnational household segment"
+q02_cons_seg_pre(ttot,all_regi,seg)		  "Calculate the baseline consumption of subnational household segments" 
+
 
 $ifthen.inconv %cm_INCONV_PENALTY% == "on"
 q02_inconvPen(ttot,all_regi)                      "Calculate the inconvenience penalty v02_inconvPen"

@@ -16,6 +16,7 @@ $Ifi "%phase%" == "sets" $include "./modules/02_welfare/ineqSeg/sets.gms"
 $Ifi "%phase%" == "declarations" $include "./modules/02_welfare/ineqSeg/declarations.gms"
 $Ifi "%phase%" == "datainput" $include "./modules/02_welfare/ineqSeg/datainput.gms"
 $Ifi "%phase%" == "equations" $include "./modules/02_welfare/ineqSeg/equations.gms"
+$Ifi "%phase%" == "preloop" $include "./modules/02_welfare/ineqSeg/preloop.gms"
 $Ifi "%phase%" == "bounds" $include "./modules/02_welfare/ineqSeg/bounds.gms"
 $Ifi "%phase%" == "postsolve" $include "./modules/02_welfare/ineqSeg/postsolve.gms"
 *######################## R SECTION END (PHASES) ###############################

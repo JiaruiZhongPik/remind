@@ -6,6 +6,9 @@
 *** |  Contact: remind@pik-potsdam.de
 *** SOF ./modules/02_welfare/ineqSeg/equations.gms
 
+
+
+
 ***---------------------------------------------------------------------------
 *' The objective of the optimization is to maximize the total discounted intertemporal utility.
 *' It is summed over all regions. 
@@ -18,9 +21,8 @@ q02_welfareGlob..
 
 ***---------------------------------------------------------------------------
 *' Total discounted intertemporal regional welfare calculated from per capita
-*' consumption summing over all time steps taking into account the pure time
-*' preference rate.  Assuming an intertemporal elasticity of substitution of 1,
-*' it holds:
+*' equivalent consumption summing over all time steps taking into account the
+*' pure time preference rate and inequality aversion.
 ***---------------------------------------------------------------------------
 q02_welfare(regi) ..
   v02_welfare(regi) 
@@ -30,7 +32,7 @@ q02_welfare(regi) ..
     * pm_ts(ttot)
     / ((1 + pm_prtp(regi)) ** (pm_ttot_val(ttot) - 2005))
     * ( ( pm_pop(ttot,regi) 
-        * ( ( ( ( vm_cons(ttot,regi)
+        * ( ( ( ( v02_cons_eq(ttot,regi)
 	        / pm_pop(ttot,regi)
 		)
 	     ** (1 - 1 / pm_ies(regi))
@@ -38,7 +40,7 @@ q02_welfare(regi) ..
 	      )
 	    / (1 - 1 / pm_ies(regi))
 	    )$( pm_ies(regi) ne 1 )
-	  + log(vm_cons(ttot,regi) / pm_pop(ttot,regi))$( pm_ies(regi) eq 1 )
+	  + log(v02_cons_eq(ttot,regi) / pm_pop(ttot,regi))$( pm_ies(regi) eq 1 )
           )
         )
 $ifthen %cm_INCONV_PENALTY% == "on"
@@ -62,6 +64,52 @@ $endif
       )
     )
 ;
+
+*JZ* replacing vm_cons with v02_cons_eq has an issue that v02_cons_eq doesn't have the value for 2005.
+
+***--------------------------------------------------------------------------
+*' Regional equivalent consumption taking into account inequality aversion.
+*' The inequality parameters is assumed to equal to intertemporal elasticity
+*' of substitution. 
+***--------------------------------------------------------------------------
+q02_cons_eq(t,regi)$(t.val > 2005)..
+   v02_cons_eq(t,regi)
+   =e=
+     sum(seg,(v02_cons_seg(t,regi,seg)
+        ** (1 - p02_ineqa))
+        / (1 - p02_ineqa)
+             )
+;
+
+
+***there seem to be a problem if 1.5 is replaced with pm_ies(regi),presumably an issue with the scale of the parameter in default
+
+
+
+***--------------------------------------------------------------------------
+*' Here starts the inequality module to model the post-distribution from the 
+*' baseline distribution
+***--------------------------------------------------------------------------
+
+* Generate baseline distribution
+
+q02_cons_seg_pre(t,regi,seg)$(t.val > 2005)..
+  v02_cons_seg_pre(t,regi,seg)
+  =e=
+    p02_cons_ref(t,regi) * p02_consShare_seg_pre(t,regi,seg)
+;
+
+
+* Generate post distribution
+
+q02_cons_seg(t,regi,seg)$(t.val > 2005)..
+  v02_cons_seg(t,regi,seg)
+  =e=
+      vm_cons(t,regi) * v02_cons_seg_pre(t,regi,seg) / p02_cons_ref(t,regi) 
+;
+
+
+
 
 ***---------------------------------------------------------------------------
 *' Calculation of the inconvenience penalty:
